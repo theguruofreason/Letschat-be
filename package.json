@@ -1,0 +1,27 @@
+{
+  "name": "letschat-be",
+  "version": "1.0.0",
+  "description": "The backend for Let's Chat; a simple web chat application.",
+  "repository": {
+    "type": "git",
+    "url": "github.com/theguruofreason/Letschat-be"
+  },
+  "license": "ISC",
+  "author": "James Iden Busia",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --watch index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongodb": "^7.6.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.6"
+  }
+}
