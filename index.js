@@ -3,11 +3,20 @@ import "dotenv/config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { authRouter } from "./auth.js";
-import chatRouter from "./chat.js";
+import chatRouter, { onConnect, onUpgrade } from "./chat.js";
+
+import { WebSocketServer } from "ws";
+import { createServer } from "http";
 
 const { PORT, LETSCHAT_FRONTEND_ORIGIN } = process.env;
 
 const app = express();
+const server = createServer(app);
+export const wss = new WebSocketServer({ server });
+
+wss.on("connection", onConnect);
+
+server.on("upgrade", onUpgrade);
 
 app.use(cors());
 app.use(cookieParser());
@@ -20,6 +29,6 @@ app.get("/", (_, res) => {
 app.use("/auth", authRouter);
 app.use("/chat", chatRouter);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Let's Chat server is listening on port ${PORT}`);
 });
