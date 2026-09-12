@@ -80,7 +80,7 @@ authRouter.post("/login", async (req, res) => {
                 sameSite: "Strict",
             })
                 .status(200)
-                .json(JSON.stringify({ accessToken }));
+                .json({ accessToken });
         }
         return;
     });
