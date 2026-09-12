@@ -91,8 +91,4 @@ chatRouter.get("/mine", auth, async (req, res) => {
     res.status(200).json(mine);
 });
 
-chatRouter.get("/connect", auth, (req, res) => {
-    res.status(200).json({ ok: true });
-});
-
 export default chatRouter;
