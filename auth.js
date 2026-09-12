@@ -125,13 +125,20 @@ authRouter.get("/test", auth, (_, res) => {
 });
 
 export function auth(req, res, next) {
-    const accessToken = req.get("authorization").replace("bearer ", "");
-    jwt.verify(accessToken, JWT_SECRET, (err) => {
+    const authHeader = req.get("authorization");
+    if (!authHeader) {
+        res.status(401).send("Invalid token.");
+        return;
+    }
+    const accessToken = authHeader.replace("bearer ", "");
+    jwt.verify(accessToken, JWT_SECRET, (err, decoded) => {
         if (err) {
             res.status(401).send("Invalid token.");
             return;
         }
 
+        // Make the authenticated username available to route handlers.
+        req.user = decoded.user;
         next();
         return;
     });

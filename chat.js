@@ -68,8 +68,31 @@ chatRouter.get("/", (_, res) => {
     res.send("Chat route is ay-okay!");
 });
 
-chatRouter.get("/history", (req, res) => {});
+// Public: recent shared-room history, for the unauthenticated preview and
+// as the initial snapshot before the websocket takes over live updates.
+chatRouter.get("/history", async (req, res) => {
+    const limit = Math.min(parseInt(req.query.limit, 10) || 200, 500);
+    const recent = await db
+        .collection("chatHistory")
+        .find({})
+        .sort({ date: -1 })
+        .limit(limit)
+        .toArray();
+    res.status(200).json(recent.reverse());
+});
 
-chatRouter.get("/connect", auth, (req, res) => {});
+// Auth required: a single user's own saved messages, for their Profile page.
+chatRouter.get("/mine", auth, async (req, res) => {
+    const mine = await db
+        .collection("chatHistory")
+        .find({ user: req.user })
+        .sort({ date: 1 })
+        .toArray();
+    res.status(200).json(mine);
+});
+
+chatRouter.get("/connect", auth, (req, res) => {
+    res.status(200).json({ ok: true });
+});
 
 export default chatRouter;
