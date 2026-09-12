@@ -18,7 +18,12 @@ wss.on("connection", onConnect);
 
 server.on("upgrade", onUpgrade);
 
-app.use(cors());
+app.use(
+    cors({
+        origin: LETSCHAT_FRONTEND_ORIGIN || "http://localhost:3000",
+        credentials: true,
+    }),
+);
 app.use(cookieParser());
 app.use(express.json());
 
