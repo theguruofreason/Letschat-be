@@ -72,13 +72,20 @@ authRouter.post("/login", async (req, res) => {
                 { user },
                 { $set: { refresh: Date.now() + 30 * 24 * 60 * 60 * 1000 } },
             );
-            res.cookie("refresh_token", JSON.stringify(refreshToken), {
+            res.cookie("refresh_token", encodeURIComponent(refreshToken), {
                 httpOnly: true,
                 maxAge: 30 * 24 * 60 * 60 * 1000,
                 path: "/auth/refresh",
                 secure: true,
                 sameSite: "Strict",
             })
+                .cookie("refresh_token", encodeURIComponent(refreshToken), {
+                    httpOnly: true,
+                    maxAge: 30 * 24 * 60 * 60 * 1000,
+                    path: "/auth/logout",
+                    secure: true,
+                    sameSite: "Strict",
+                })
                 .status(200)
                 .json({ accessToken });
         }
@@ -88,7 +95,7 @@ authRouter.post("/login", async (req, res) => {
 });
 
 authRouter.get("/refresh", (req, res) => {
-    const refreshToken = req.cookies.refresh_token.replaceAll('"', "");
+    const refreshToken = req.cookies.refresh_token;
     if (!refreshToken) {
         res.status(401).send("Invalid token.");
         return;
@@ -117,6 +124,29 @@ authRouter.get("/refresh", (req, res) => {
         return;
     });
     return;
+});
+
+authRouter.get("/logout", (req, res) => {
+    const refreshToken = req.cookies.refresh_token;
+    if (!refreshToken) {
+        res.status(401).send("Invalid token.");
+        return;
+    }
+
+    jwt.verify(refreshToken, JWT_SECRET, (err, decodedToken) => {
+        if (err) {
+            console.error(err);
+            res.status(401).send("Invalid token.");
+            return;
+        }
+
+        db.collection("users").updateOne(
+            { user: decodedToken.user },
+            { $set: { refresh: null } },
+        );
+        res.status(200).send(`User ${decodedToken.user} logged out.`);
+        return;
+    });
 });
 
 authRouter.get("/test", auth, (_, res) => {
