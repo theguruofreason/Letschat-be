@@ -101,14 +101,14 @@ authRouter.get("/refresh", (req, res) => {
         return;
     }
 
-    jwt.verify(refreshToken, JWT_SECRET, (err, decodedToken) => {
+    jwt.verify(refreshToken, JWT_SECRET, async (err, decodedToken) => {
         if (err) {
             console.error(err);
             res.status(401).send("Invalid token.");
             return;
         }
 
-        const userInfo = db
+        const userInfo = await db
             .collection("users")
             .findOne({ user: decodedToken.user });
         if (userInfo.refresh <= Date.now()) {

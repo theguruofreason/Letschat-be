@@ -20,9 +20,6 @@ export function onConnect(ws, req) {
                 date: Date.now(),
                 message: message.toString("utf-8"),
             })
-            .then((result) => {
-                console.log(result);
-            })
             .catch((err) => console.error(err));
         const outgoing = {
             user,
